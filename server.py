@@ -14,7 +14,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     medicamento_openfda = '&search=active_ingredient:'
     compañia_openfda = '&search=openfda.manufacturer_name:'
 
-    def pag_inicial(self):  
+    def pagina_inicio(self):  
         # la estructura de nuestra pagina viene determinada por este html
         html = """   
             <html>
