@@ -58,7 +58,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 """
         return html
 
-    def segunda_pag(self, lista): 
+    def pagina_2(self, lista): 
         datos_html = """
                                 <html>
                                     <head>
