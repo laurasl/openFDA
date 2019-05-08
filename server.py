@@ -1,10 +1,11 @@
-import json 
+import json
 import socketserver
 import http.server
 import http.client
- 
 
-PORT = 8000  
+
+PORT = 8000
+
 
 
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -14,9 +15,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     medicamento_openfda = '&search=active_ingredient:'
     company_openfda = '&search=openfda.manufacturer_name:'
 
-    def pagina_inicio(self):  
+    def pagina_inicio(self):
         # la estructura de nuestra pagina viene determinada por este html
-        html = """   
+        html = """
             <html>
                 <head>
                     <title> OpenFDA</title>
@@ -58,16 +59,16 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 """
         return html
 
-    def pagina_2(self, lista): 
+    def pagina_2(self, lista):
         datos_html = """
                                 <html>
                                     <head>
-                                        <title>Laura´s App</title>   
+                                        <title>Laura´s App</title>
                                     </head>
                                     <body style='background-color: lightpink'>
                                         <ul>
                             """
-        for i in lista:  
+        for i in lista:
             datos_html += "<li>" + i + "</li>"
 
         datos_html += """
@@ -79,7 +80,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def results_obtenidos(self, limit=10):  # conseguimos unos resultados
         conectar = http.client.HTTPSConnection(self.link_openfda)  # establecemos conexion
-        conectar.request("GET", self.json_openfda + "?limit=" + str(limit))  
+        conectar.request("GET", self.json_openfda + "?limit=" + str(limit))
         print(self.json_openfda + "?limit=" + str(limit))
         resp_1 = conectar.getresponse()  # obtenemos la respuesta por parte del servidor
         datos_cod = resp_1.read().decode("utf8")  # Leer el contenido en json, y transformarlo en una cadena
@@ -106,13 +107,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
         if self.path == '/':
 
-            self.send_response(200)  
-            self.send_header('Content-type', 'text/html') 
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
             self.end_headers()
             html = self.pagina_inicio()
             self.wfile.write(bytes(html, "utf8"))
 
-        elif 'listDrugs' in self.path:  
+        elif 'listDrugs' in self.path:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
@@ -127,7 +128,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             self.wfile.write(bytes(resultado_html, "utf8"))
 
-        elif 'listCompanies' in self.path:  
+        elif 'listCompanies' in self.path:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
@@ -141,33 +142,33 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             resultado_html = self.pagina_2(company)
 
             self.wfile.write(bytes(resultado_html, "utf8"))
-        elif 'listWarnings' in self.path:  
+        elif 'listWarnings' in self.path:
 
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            advs = []
+            warnings = []
             results_obtenidos = self.results_obtenidos(limit)
             for resultado in results_obtenidos:  # introducimos nuestros results_obtenidos en una lista
-                if ('advs' in resultado):
-                    advs.append(resultado['advs'][0])
+                if ('warnings' in resultado):
+                    warnings.append(resultado['warnings'][0])
                 else:
-                    advs.append('Desconocido')
-            resultado_html = self.pagina_2(advs)
+                    warnings.append('Desconocido')
+            resultado_html = self.pagina_2(warnings)
 
             self.wfile.write(bytes(resultado_html, "utf8"))
 
-        elif 'searchDrug' in self.path:  
+        elif 'searchDrug' in self.path:
 
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            
+
             limit = 10
             drug = self.path.split('=')[1]
 
             medicamentos = []
-            conectar = http.client.HTTPSConnection(self.link_openfda) 
+            conectar = http.client.HTTPSConnection(self.link_openfda)
             conectar.request("GET", self.json_openfda + "?limit=" + str(limit) + self.medicamento_openfda + drug)
             resp_1 = conectar.getresponse()
             datos1 = resp_1.read()
@@ -184,9 +185,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(resultado_html, "utf8"))
 
 
-        elif 'searchCompany' in self.path: 
+        elif 'searchCompany' in self.path:
 
-            self.send_response(200) 
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
@@ -203,7 +204,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             for search in search_company:
                 companies.append(search['openfda']['manufacturer_name'][0])
-            resultado_html = self.pagina_2(company)
+            resultado_html = self.pagina_2(companies)
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         # Aquí tenemos una serie de extensiones
@@ -227,7 +228,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         return
 
 
-socketserver.TCPServer.allow_reuse_address = True  
+socketserver.TCPServer.allow_reuse_address = True
 Handler = testHTTPRequestHandler
 httpd = socketserver.TCPServer(("", PORT), Handler)
 print("serving at port", PORT)
