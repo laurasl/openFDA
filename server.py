@@ -12,7 +12,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     link_openfda = "api.fda.gov"
     json_openfda = "/drug/label.json"
     medicamento_openfda = '&search=active_ingredient:'
-    compañia_openfda = '&search=openfda.manufacturer_name:'
+    company_openfda = '&search=openfda.manufacturer_name:'
 
     def pagina_inicio(self):  
         # la estructura de nuestra pagina viene determinada por este html
@@ -131,14 +131,14 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            compañia = []
+            company = []
             results_obtenidos = self.results_obtenidos(limit)
             for resultado in results_obtenidos:
                 if ('manufacturer_name' in resultado['openfda']):
-                    compañia.append(resultado['openfda']['manufacturer_name'][0])
+                    company.append(resultado['openfda']['manufacturer_name'][0])
                 else:
-                    compañia.append('Desconocido')
-            resultado_html = self.pagina_2(compañia)
+                    company.append('Desconocido')
+            resultado_html = self.pagina_2(company)
 
             self.wfile.write(bytes(resultado_html, "utf8"))
         elif 'listWarnings' in self.path:  
@@ -192,9 +192,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             limit = 10
             company = self.path.split('=')[1]
-            compañias = []
+            companies = []
             conectar = http.client.HTTPSConnection(self.link_openfda)
-            conectar.request("GET", self.json_openfda + "?limit=" + str(limit) + self.compañia_openfda + company)
+            conectar.request("GET", self.json_openfda + "?limit=" + str(limit) + self.company_openfda + company)
             resp_1 = conectar.getresponse()
             datos1 = resp_1.read()
             datos = datos1.decode("utf8")
@@ -202,8 +202,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             search_company = biblioteca_company['results']
 
             for search in search_company:
-                compañias.append(search['openfda']['manufacturer_name'][0])
-            resultado_html = self.pagina_2(compañia)
+                companies.append(search['openfda']['manufacturer_name'][0])
+            resultado_html = self.pagina_2(company)
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         # Aquí tenemos una serie de extensiones
